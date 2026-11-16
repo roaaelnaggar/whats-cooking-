@@ -47,15 +47,18 @@
             </button>
 
             <!-- Navigation Links -->
-            <ul class="nav__menu" id="nav-menu" role="menubar">
-                <li role="none"><a href="#" class="nav__link nav__link--active" data-section="home" role="menuitem">Home</a></li>
-                <li role="none"><a href="#" class="nav__link" data-section="recipes" role="menuitem">Recipes</a></li>
-                <li role="none"><a href="#" class="nav__link" data-section="ingredient-finder" role="menuitem">Ingredient Finder</a></li>
-                <li role="none"><a href="#" class="nav__link" data-section="categories" role="menuitem">Categories</a></li>
-                <li role="none"><a href="#" class="nav__link" data-section="favorites" role="menuitem">Favorites</a></li>
+            <ul class="nav__menu" id="nav-menu">
+                <li><a href="#" class="nav__link nav__link--active" data-section="home">Home</a></li>
+                <li><a href="#" class="nav__link" data-section="recipes">Recipes</a></li>
+                <li><a href="#" class="nav__link" data-section="ingredient-finder">Ingredient Finder</a></li>
+                <li><a href="#" class="nav__link" data-section="categories">Categories</a></li>
+                <li><a href="#" class="nav__link" data-section="favorites">Favorites</a></li>
             </ul>
         </nav>
     </header>
+
+    <!-- Mobile Navigation Backdrop Overlay -->
+    <div class="nav__backdrop" id="nav-backdrop" aria-hidden="true"></div>
 
     <!-- ============================================================
          MAIN CONTENT (Single-Page Application Views)
@@ -81,7 +84,7 @@
                     <div class="hero__actions">
                         <button class="btn btn--primary btn--lg hero__cta" data-section="recipes">
                             <span>Explore All Recipes</span>
-                            <svg class="btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg class="btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
                             </svg>
@@ -164,6 +167,7 @@
                         <span class="empty-state__icon" aria-hidden="true">🔍</span>
                         <h3 class="empty-state__title">No recipes found</h3>
                         <p class="empty-state__text">We couldn't find any dishes matching your query. Try searching for broader terms like "pasta", "chicken", or "oats".</p>
+                        <button class="btn btn--secondary" id="search-reset-btn" type="button">Show All Recipes</button>
                     </div>
                 </div>
             </div>
@@ -275,6 +279,7 @@
                         <span class="empty-state__icon" aria-hidden="true">📂</span>
                         <h3 class="empty-state__title">No recipes in this collection</h3>
                         <p class="empty-state__text">Please select another collection or return to All Dishes.</p>
+                        <button class="btn btn--secondary" id="category-reset-btn" type="button">Show All Dishes</button>
                     </div>
                 </div>
             </div>

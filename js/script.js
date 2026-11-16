@@ -139,6 +139,7 @@
         // Navigation
         navToggle: document.getElementById('nav-toggle'),
         navMenu: document.getElementById('nav-menu'),
+        navBackdrop: document.getElementById('nav-backdrop'),
         sections: document.querySelectorAll('.section'),
 
         // Grids & Sections
@@ -175,6 +176,9 @@
         modalBody: document.getElementById('modal-body')
     };
 
+    // Keep track of the element that had focus before the modal opened (WCAG 2.4.3)
+    let lastFocusedElement = null;
+
     /* ============================================================
        4. RECIPE CARD RENDERER (FR-02)
        ============================================================ */
@@ -190,7 +194,6 @@
         card.className = 'recipe-card';
         card.setAttribute('data-recipe-id', recipe.id);
         card.setAttribute('tabindex', '0');
-        card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `View details for ${recipe.name}`);
 
         const favorited = isFavorited(recipe.id);
@@ -305,6 +308,9 @@
         if (typeof recipes === 'undefined' || !Array.isArray(recipes)) return;
         const recipe = recipes.find(r => r.id === recipeId);
         if (!recipe || !elements.modal || !elements.modalBody) return;
+
+        // Remember triggering element to restore focus on close (WCAG 2.4.3)
+        lastFocusedElement = document.activeElement;
 
         const favorited = isFavorited(recipe.id);
         const emoji = recipeEmojis[recipe.id] || '🍲';
@@ -423,6 +429,11 @@
         elements.modal.classList.remove('open');
         elements.modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-open');
+
+        // Restore focus to triggering card (WCAG 2.4.3)
+        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+            lastFocusedElement.focus();
+        }
     }
 
     /* ============================================================
@@ -480,6 +491,7 @@
             closeMobileNav();
         } else {
             elements.navMenu.classList.add('open');
+            elements.navBackdrop?.classList.add('active');
             elements.navToggle.classList.add('active');
             elements.navToggle.setAttribute('aria-expanded', 'true');
         }
@@ -488,6 +500,7 @@
     function closeMobileNav() {
         if (!elements.navMenu || !elements.navToggle) return;
         elements.navMenu.classList.remove('open');
+        elements.navBackdrop?.classList.remove('active');
         elements.navToggle.classList.remove('active');
         elements.navToggle.setAttribute('aria-expanded', 'false');
     }
@@ -586,21 +599,30 @@
      * @param {string} rawIngredient 
      */
     function addFinderIngredient(rawIngredient) {
-        const cleaned = rawIngredient.trim().toLowerCase();
-        if (!cleaned) return;
+        if (!rawIngredient) return;
 
-        // Reject duplicate (case-insensitive) (VR-04-2)
-        if (state.finderIngredients.includes(cleaned)) {
-            elements.finderInput.value = '';
-            return;
+        // Support comma-separated input (e.g. "chicken, garlic, tomato")
+        const parts = rawIngredient.split(',');
+        let addedAny = false;
+
+        parts.forEach(part => {
+            const cleaned = part.trim().toLowerCase();
+            // Reject empty or duplicates (case-insensitive) (VR-04-1, VR-04-2)
+            if (cleaned && !state.finderIngredients.includes(cleaned)) {
+                state.finderIngredients.push(cleaned);
+                addedAny = true;
+            }
+        });
+
+        if (addedAny) {
+            renderFinderChips();
+            updateFinderResults();
         }
 
-        state.finderIngredients.push(cleaned);
-        renderFinderChips();
-        updateFinderResults();
-
-        elements.finderInput.value = '';
-        elements.finderInput.focus();
+        if (elements.finderInput) {
+            elements.finderInput.value = '';
+            elements.finderInput.focus();
+        }
     }
 
     /**
@@ -660,9 +682,10 @@
             let matchCount = 0;
 
             state.finderIngredients.forEach(userIng => {
-                const hasMatch = recipe.ingredients.some(recipeIng =>
-                    recipeIng.name.toLowerCase().includes(userIng)
-                );
+                const hasMatch = recipe.ingredients.some(recipeIng => {
+                    const ingName = recipeIng.name.toLowerCase();
+                    return ingName.includes(userIng) || userIng.includes(ingName);
+                });
                 if (hasMatch) {
                     matchCount++;
                 }
@@ -727,6 +750,20 @@
         // Navigation toggle
         elements.navToggle?.addEventListener('click', toggleMobileNav);
 
+        // Backdrop click closes mobile nav
+        elements.navBackdrop?.addEventListener('click', closeMobileNav);
+
+        // Click outside closes mobile nav (VR-08-4)
+        document.addEventListener('click', (e) => {
+            if (elements.navMenu?.classList.contains('open')) {
+                const clickedMenu = e.target.closest('#nav-menu');
+                const clickedToggle = e.target.closest('#nav-toggle');
+                if (!clickedMenu && !clickedToggle) {
+                    closeMobileNav();
+                }
+            }
+        });
+
         // Delegate clicks for section navigation buttons & links
         document.addEventListener('click', (e) => {
             const navTarget = e.target.closest('[data-section]');
@@ -737,14 +774,34 @@
             }
         });
 
-        // Close mobile nav on Escape
+        // Close mobile nav and modal on Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (elements.navMenu?.classList.contains('open')) {
-                    closeMobileNav();
-                }
                 if (elements.modal?.classList.contains('open')) {
                     closeRecipeModal();
+                    return;
+                }
+                if (elements.navMenu?.classList.contains('open')) {
+                    closeMobileNav();
+                    return;
+                }
+            }
+        });
+
+        // Modal focus trap for accessibility (Tab key navigation)
+        elements.modal?.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                const focusable = elements.modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable.length === 0) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
                 }
             }
         });
@@ -759,7 +816,27 @@
             applyRecipeSearch();
         });
 
+        // Clear search on Escape when search input is focused
+        elements.searchInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                elements.searchInput.value = '';
+                state.searchQuery = '';
+                applyRecipeSearch();
+            }
+        });
+
         elements.searchClear?.addEventListener('click', () => {
+            if (elements.searchInput) {
+                elements.searchInput.value = '';
+                state.searchQuery = '';
+                applyRecipeSearch();
+                elements.searchInput.focus();
+            }
+        });
+
+        // Empty state reset button
+        const searchResetBtn = document.getElementById('search-reset-btn');
+        searchResetBtn?.addEventListener('click', () => {
             if (elements.searchInput) {
                 elements.searchInput.value = '';
                 state.searchQuery = '';
@@ -783,12 +860,22 @@
             });
         });
 
-        // Category filter buttons
+        // Category filter buttons — supports deselection toggle (SRS FR-05 item 5, TC-29)
         elements.categoryFilterBtns?.forEach(catBtn => {
             catBtn.addEventListener('click', () => {
                 const category = catBtn.getAttribute('data-category') || 'all';
-                applyCategoryFilter(category);
+                if (state.selectedCategory === category && category !== 'all') {
+                    applyCategoryFilter('all');
+                } else {
+                    applyCategoryFilter(category);
+                }
             });
+        });
+
+        // Category empty state reset button
+        const categoryResetBtn = document.getElementById('category-reset-btn');
+        categoryResetBtn?.addEventListener('click', () => {
+            applyCategoryFilter('all');
         });
 
         // Ingredient Finder: Add button & Enter key

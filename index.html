@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's Cooking? — Modern Recipe Discovery & Food Editorial</title>
+    <meta name="description" content="Discover honest, delicious recipes with the ingredients you already have. An editorial culinary discovery companion.">
+    
+    <!-- Google Fonts: Playfair Display (Editorial Display Serif) & Inter (Clean UI Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Fallback for disabled JavaScript (SRS EH-10) -->
+    <noscript>
+        <div class="noscript-msg">
+            <p>🍳 <strong>What's Cooking?</strong> requires JavaScript to function. Please enable JavaScript in your browser settings.</p>
+        </div>
+    </noscript>
+
+    <!-- ============================================================
+         HEADER & NAVIGATION  (FR-08)
+         Sticky editorial nav bar with logo, 5 links, and mobile hamburger menu.
+         ============================================================ -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <!-- Brand Wordmark — clicks navigate to Home -->
+            <a href="#" class="nav__logo" data-section="home" aria-label="What's Cooking? — Home">
+                <span class="nav__logo-mark" aria-hidden="true">🌿</span>
+                <span class="nav__logo-text">What's Cooking?</span>
+            </a>
+
+            <!-- Hamburger Toggle (mobile only) -->
+            <button
+                class="nav__toggle"
+                id="nav-toggle"
+                aria-label="Toggle navigation menu"
+                aria-expanded="false"
+                aria-controls="nav-menu"
+            >
+                <span class="nav__toggle-bar"></span>
+                <span class="nav__toggle-bar"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <ul class="nav__menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="#" class="nav__link nav__link--active" data-section="home" role="menuitem">Home</a></li>
+                <li role="none"><a href="#" class="nav__link" data-section="recipes" role="menuitem">Recipes</a></li>
+                <li role="none"><a href="#" class="nav__link" data-section="ingredient-finder" role="menuitem">Ingredient Finder</a></li>
+                <li role="none"><a href="#" class="nav__link" data-section="categories" role="menuitem">Categories</a></li>
+                <li role="none"><a href="#" class="nav__link" data-section="favorites" role="menuitem">Favorites</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ============================================================
+         MAIN CONTENT (Single-Page Application Views)
+         ============================================================ -->
+    <main class="main" id="main">
+
+        <!-- ========================================================
+             1. HOME SECTION  (FR-01)
+             Warm editorial hero + curated featured recipes.
+             ======================================================== -->
+        <section id="home" class="section section--active" aria-label="Home">
+
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero__glow" aria-hidden="true"></div>
+                <div class="hero__content container">
+                    <span class="hero__badge">Seasonal & Mindful Cooking</span>
+                    <h1 class="hero__title">Discover honest meals with what's in your kitchen.</h1>
+                    <p class="hero__tagline">
+                        No cluttered ads or endless stories. Just thoughtful recipes, structured steps, 
+                        and intuitive ingredient discovery for every everyday home cook.
+                    </p>
+                    <div class="hero__actions">
+                        <button class="btn btn--primary btn--lg hero__cta" data-section="recipes">
+                            <span>Explore All Recipes</span>
+                            <svg class="btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                        <button class="btn btn--secondary btn--lg" data-section="ingredient-finder">
+                            <span>Find by Ingredients</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Recipes Highlight -->
+            <div class="featured" id="featured-section">
+                <div class="container">
+                    <div class="section__header">
+                        <div>
+                            <span class="section__eyebrow">Curated Selection</span>
+                            <h2 class="section__heading">Editor's Table Picks</h2>
+                        </div>
+                        <p class="section__subtitle">Hand-picked dishes to inspire your next gathering or quiet dinner</p>
+                    </div>
+                    <div id="featured-grid" class="recipe-grid">
+                        <!-- Injected by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             2. RECIPES SECTION  (FR-02, FR-03)
+             Editorial search controls + full recipe grid.
+             ======================================================== -->
+        <section id="recipes" class="section" aria-label="All Recipes">
+            <div class="container">
+                <div class="section__header">
+                    <div>
+                        <span class="section__eyebrow">Recipe Catalog</span>
+                        <h2 class="section__heading">All Recipes</h2>
+                    </div>
+                    <p class="section__subtitle">Browse our complete collection of wholesome, tested dishes</p>
+                </div>
+
+                <!-- Search Bar & Mode Toggle -->
+                <div class="search" id="search">
+                    <div class="search__bar">
+                        <svg class="search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input
+                            type="text"
+                            id="search-input"
+                            class="search__input"
+                            placeholder="Search by recipe name or ingredient..."
+                            aria-label="Search recipes"
+                            autocomplete="off"
+                        >
+                        <button class="search__clear hidden" id="search-clear" aria-label="Clear search">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="search__modes" role="tablist" aria-label="Search mode">
+                        <span class="search__mode-label">Search in:</span>
+                        <button class="search__mode search__mode--active" data-mode="name" role="tab" aria-selected="true">Recipe Name</button>
+                        <button class="search__mode" data-mode="ingredient" role="tab" aria-selected="false">Ingredients</button>
+                    </div>
+                </div>
+
+                <!-- Recipe Grid -->
+                <div id="recipes-grid" class="recipe-grid">
+                    <!-- Injected by JavaScript -->
+                </div>
+
+                <!-- Empty State — No Search Results -->
+                <div id="recipes-empty" class="empty-state hidden" aria-live="polite">
+                    <div class="empty-state__content">
+                        <span class="empty-state__icon" aria-hidden="true">🔍</span>
+                        <h3 class="empty-state__title">No recipes found</h3>
+                        <p class="empty-state__text">We couldn't find any dishes matching your query. Try searching for broader terms like "pasta", "chicken", or "oats".</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             3. INGREDIENT FINDER SECTION  (FR-04)
+             Tactile pantry workbench: multi-ingredient matching.
+             ======================================================== -->
+        <section id="ingredient-finder" class="section" aria-label="Ingredient Finder">
+            <div class="container">
+                <div class="section__header">
+                    <div>
+                        <span class="section__eyebrow">Pantry Discovery</span>
+                        <h2 class="section__heading">Ingredient Finder</h2>
+                    </div>
+                    <p class="section__subtitle">Tell us what you have on hand, and we'll show you what you can create right now</p>
+                </div>
+
+                <!-- Ingredient Input & Chips -->
+                <div class="finder">
+                    <div class="finder__input-group">
+                        <input
+                            type="text"
+                            id="finder-input"
+                            class="finder__input"
+                            placeholder="Add an ingredient (e.g. eggs, tomatoes, garlic)..."
+                            aria-label="Enter an ingredient"
+                            autocomplete="off"
+                        >
+                        <button class="btn btn--primary finder__add" id="finder-add">
+                            <span>+ Add to Pantry</span>
+                        </button>
+                    </div>
+                    <div id="finder-chips" class="finder__chips" aria-label="Selected pantry ingredients">
+                        <!-- Injected by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div id="finder-grid" class="recipe-grid">
+                    <!-- Injected by JavaScript -->
+                </div>
+
+                <!-- Empty State — No Ingredients Entered -->
+                <div id="finder-empty" class="empty-state" aria-live="polite">
+                    <div class="empty-state__content">
+                        <span class="empty-state__icon" aria-hidden="true">🧺</span>
+                        <h3 class="empty-state__title">Your pantry workbench is empty</h3>
+                        <p class="empty-state__text">Type ingredients you already have at home and press Add to reveal matching recipes sorted by best match.</p>
+                    </div>
+                </div>
+
+                <!-- Empty State — No Matching Recipes -->
+                <div id="finder-no-match" class="empty-state hidden" aria-live="polite">
+                    <div class="empty-state__content">
+                        <span class="empty-state__icon" aria-hidden="true">🥣</span>
+                        <h3 class="empty-state__title">No direct recipe matches</h3>
+                        <p class="empty-state__text">None of our current dishes use this exact combination. Try removing an item or adding staple ingredients like olive oil, flour, or eggs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             4. CATEGORIES SECTION  (FR-05)
+             Editorial meal filters & category collections.
+             ======================================================== -->
+        <section id="categories" class="section" aria-label="Recipe Categories">
+            <div class="container">
+                <div class="section__header">
+                    <div>
+                        <span class="section__eyebrow">Organized by Occasion</span>
+                        <h2 class="section__heading">Recipe Collections</h2>
+                    </div>
+                    <p class="section__subtitle">Explore meals structured by course and dietary preference</p>
+                </div>
+
+                <!-- Category Filter Buttons -->
+                <div class="category-filters" id="category-filters" role="group" aria-label="Filter by category">
+                    <button class="category-filters__btn category-filters__btn--active" data-category="all">
+                        <span class="category-filters__label">All Dishes</span>
+                    </button>
+                    <button class="category-filters__btn" data-category="Breakfast">
+                        <span class="category-filters__label">Breakfast</span>
+                    </button>
+                    <button class="category-filters__btn" data-category="Lunch">
+                        <span class="category-filters__label">Lunch</span>
+                    </button>
+                    <button class="category-filters__btn" data-category="Dinner">
+                        <span class="category-filters__label">Dinner</span>
+                    </button>
+                    <button class="category-filters__btn" data-category="Desserts">
+                        <span class="category-filters__label">Desserts</span>
+                    </button>
+                    <button class="category-filters__btn" data-category="Vegetarian">
+                        <span class="category-filters__label">Vegetarian</span>
+                    </button>
+                </div>
+
+                <!-- Filtered Recipe Grid -->
+                <div id="categories-grid" class="recipe-grid">
+                    <!-- Injected by JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="categories-empty" class="empty-state hidden" aria-live="polite">
+                    <div class="empty-state__content">
+                        <span class="empty-state__icon" aria-hidden="true">📂</span>
+                        <h3 class="empty-state__title">No recipes in this collection</h3>
+                        <p class="empty-state__text">Please select another collection or return to All Dishes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             5. FAVORITES SECTION  (FR-07)
+             Personal recipe box persisted in LocalStorage.
+             ======================================================== -->
+        <section id="favorites" class="section" aria-label="My Favorites">
+            <div class="container">
+                <div class="section__header">
+                    <div>
+                        <span class="section__eyebrow">Personal Kitchen Box</span>
+                        <h2 class="section__heading">Saved Recipes</h2>
+                    </div>
+                    <p class="section__subtitle">Your handpicked dishes, saved locally for easy reference whenever you cook</p>
+                </div>
+
+                <!-- Favorites Grid -->
+                <div id="favorites-grid" class="recipe-grid">
+                    <!-- Injected by JavaScript -->
+                </div>
+
+                <!-- Empty State — No Favorites -->
+                <div id="favorites-empty" class="empty-state" aria-live="polite">
+                    <div class="empty-state__content">
+                        <span class="empty-state__icon" aria-hidden="true">♡</span>
+                        <h3 class="empty-state__title">Your recipe box is empty</h3>
+                        <p class="empty-state__text">Whenever you find a dish you'd love to prepare, tap the heart icon on any recipe card to save it here.</p>
+                        <button class="btn btn--primary" data-section="recipes">
+                            <span>Browse Recipes</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+         RECIPE DETAIL MODAL  (FR-06)
+         Refined editorial modal sheet.
+         ============================================================ -->
+    <div id="recipe-modal" class="modal" aria-hidden="true" role="dialog" aria-label="Recipe details">
+        <div class="modal__overlay" id="modal-overlay"></div>
+        <div class="modal__container">
+            <button class="modal__close" id="modal-close" aria-label="Close recipe details">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div id="modal-body" class="modal__body">
+                <!-- Injected by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         FOOTER
+         Grounded dark-charcoal editorial footer.
+         ============================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__inner">
+                <div class="footer__brand-block">
+                    <div class="footer__brand">
+                        <span class="footer__brand-icon">🌿</span>
+                        <span>What's Cooking?</span>
+                    </div>
+                    <p class="footer__description">
+                        A modern, thoughtful recipe discovery platform built to simplify home cooking 
+                        and celebrate honest ingredients.
+                    </p>
+                </div>
+
+                <div class="footer__nav-block">
+                    <h4 class="footer__heading">Navigation</h4>
+                    <ul class="footer__links">
+                        <li><a href="#" data-section="home">Home</a></li>
+                        <li><a href="#" data-section="recipes">All Recipes</a></li>
+                        <li><a href="#" data-section="ingredient-finder">Ingredient Finder</a></li>
+                        <li><a href="#" data-section="categories">Recipe Collections</a></li>
+                        <li><a href="#" data-section="favorites">Saved Favorites</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer__bottom">
+                <p class="footer__copy">&copy; 2026 What's Cooking? &bull; Academic Frontend Development Project.</p>
+                <p class="footer__meta">Crafted with HTML5, CSS3, and Vanilla JavaScript.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts (recipes dataset first, then application controller) -->
+    <script src="js/recipes.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+</html>
